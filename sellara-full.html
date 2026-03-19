@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sellara — Find. Target. Sell.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0c0b10; --bg2: #13111a; --bg3: #1a1726;
+  --purple: #7c6fe0; --purple-light: #a89cf0; --purple-dim: #2e2855;
+  --purple-glow: rgba(124,111,224,0.15);
+  --text: #f0eefb; --text-muted: #8b87a8; --text-dim: #4e4a6a;
+  --border: rgba(124,111,224,0.18); --border-dim: rgba(255,255,255,0.06);
+  --green: #5ddb90; --red: #f07070; --amber: #f0a050;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+.page { display: none; min-height: 100vh; }
+.page.active { display: block; }
+
+/* NAV */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2.5rem; border-bottom: 1px solid var(--border-dim); background: rgba(12,11,16,0.9); backdrop-filter: blur(12px); }
+.nav-logo { font-family: 'Fraunces', serif; font-weight: 300; font-size: 1.4rem; letter-spacing: -0.02em; color: var(--text); cursor: pointer; }
+.nav-logo span { color: var(--purple-light); font-style: italic; }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; cursor: pointer; }
+.nav-links a:hover { color: var(--text); }
+.nav-right { display: flex; gap: 0.75rem; align-items: center; }
+.nav-cta { background: var(--purple); color: #fff; padding: 0.5rem 1.25rem; border-radius: 6px; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: none; transition: background 0.2s; font-family: 'DM Sans', sans-serif; }
+.nav-cta:hover { background: var(--purple-light); }
+.nav-admin-btn { background: none; border: 1px solid var(--border-dim); color: var(--text-dim); padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+.nav-admin-btn:hover { border-color: var(--border); color: var(--text-muted); }
+
+/* HERO */
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 8rem 2rem 4rem; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; width: 700px; height: 700px; top: 50%; left: 50%; transform: translate(-50%, -55%); background: radial-gradient(circle, rgba(124,111,224,0.12) 0%, transparent 70%); pointer-events: none; }
+.hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--purple-glow); border: 1px solid var(--border); border-radius: 100px; padding: 0.35rem 1rem; font-size: 0.78rem; color: var(--purple-light); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 2rem; animation: fadeUp 0.6s ease both; }
+.hero-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--purple); display: inline-block; }
+h1 { font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(3rem, 7vw, 5.5rem); line-height: 1.08; letter-spacing: -0.03em; max-width: 820px; margin-bottom: 1.5rem; animation: fadeUp 0.6s 0.1s ease both; }
+h1 em { font-style: italic; color: var(--purple-light); }
+.hero-sub { font-size: 1.1rem; color: var(--text-muted); max-width: 520px; margin-bottom: 2.5rem; animation: fadeUp 0.6s 0.2s ease both; font-weight: 300; }
+.hero-actions { display: flex; gap: 1rem; align-items: center; animation: fadeUp 0.6s 0.3s ease both; flex-wrap: wrap; justify-content: center; }
+.btn-primary { background: var(--purple); color: #fff; padding: 0.8rem 2rem; border-radius: 8px; font-size: 0.95rem; font-weight: 500; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; transition: background 0.2s, transform 0.15s; box-shadow: 0 0 30px rgba(124,111,224,0.3); display: inline-block; text-decoration: none; }
+.btn-primary:hover { background: var(--purple-light); transform: translateY(-2px); }
+.btn-ghost { color: var(--text-muted); padding: 0.8rem 1.5rem; font-size: 0.95rem; border: 1px solid var(--border-dim); border-radius: 8px; cursor: pointer; background: none; font-family: 'DM Sans', sans-serif; transition: color 0.2s, border-color 0.2s; display: inline-block; }
+.btn-ghost:hover { color: var(--text); border-color: var(--border); }
+.hero-note { margin-top: 1.25rem; font-size: 0.8rem; color: var(--text-dim); animation: fadeUp 0.6s 0.4s ease both; }
+
+/* STATS */
+.stats-bar { display: flex; align-items: center; justify-content: center; border-top: 1px solid var(--border-dim); border-bottom: 1px solid var(--border-dim); background: var(--bg2); }
+.stat-item { flex: 1; text-align: center; padding: 1.5rem 2rem; border-right: 1px solid var(--border-dim); }
+.stat-item:last-child { border-right: none; }
+.stat-num { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 300; color: var(--purple-light); display: block; }
+.stat-label { font-size: 0.8rem; color: var(--text-muted); }
+
+/* SECTIONS */
+.section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+.section-label { text-align: center; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--purple); margin-bottom: 1rem; }
+h2 { font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.02em; text-align: center; margin-bottom: 1rem; line-height: 1.15; }
+h2 em { font-style: italic; color: var(--purple-light); }
+.section-sub { text-align: center; color: var(--text-muted); max-width: 480px; margin: 0 auto 3.5rem; font-size: 1rem; }
+
+/* FEATURES */
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.feature-card { background: var(--bg2); border: 1px solid var(--border-dim); border-radius: 14px; padding: 2rem 1.75rem; transition: border-color 0.25s, transform 0.2s; }
+.feature-card:hover { border-color: var(--border); transform: translateY(-3px); }
+.feature-icon { width: 42px; height: 42px; background: var(--purple-dim); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; font-size: 18px; }
+.feature-title { font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--text); }
+.feature-desc { font-size: 0.875rem; color: var(--text-muted); line-height: 1.65; }
+
+/* TESTIMONIALS */
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.testimonial-card { background: var(--bg2); border: 1px solid var(--border-dim); border-radius: 14px; padding: 1.75rem; display: flex; flex-direction: column; gap: 1rem; transition: border-color 0.25s; }
+.testimonial-card:hover { border-color: var(--border); }
+.testimonial-stars { color: var(--amber); font-size: 0.85rem; letter-spacing: 2px; }
+.testimonial-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; flex: 1; font-style: italic; }
+.testimonial-author { display: flex; align-items: center; gap: 0.75rem; }
+.testimonial-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--purple-dim); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 500; color: var(--purple-light); flex-shrink: 0; }
+.testimonial-name { font-size: 0.85rem; font-weight: 500; color: var(--text); }
+.testimonial-role { font-size: 0.75rem; color: var(--text-dim); }
+
+/* EMAIL CAPTURE */
+.capture-section { background: var(--bg2); border-top: 1px solid var(--border-dim); border-bottom: 1px solid var(--border-dim); padding: 5rem 2rem; }
+.capture-inner { max-width: 560px; margin: 0 auto; text-align: center; }
+.capture-form { display: flex; gap: 0.75rem; margin-top: 2rem; }
+.capture-input { flex: 1; background: var(--bg3); border: 1px solid var(--border-dim); border-radius: 8px; padding: 0.8rem 1rem; color: var(--text); font-size: 0.9rem; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
+.capture-input:focus { border-color: var(--purple); }
+.capture-input::placeholder { color: var(--text-dim); }
+.capture-btn { background: var(--purple); color: #fff; border: none; border-radius: 8px; padding: 0.8rem 1.5rem; font-size: 0.9rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; white-space: nowrap; }
+.capture-btn:hover { background: var(--purple-light); }
+.capture-note { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.75rem; }
+.capture-success { display: none; background: rgba(93,219,144,0.1); border: 1px solid rgba(93,219,144,0.25); border-radius: 8px; padding: 0.85rem 1.25rem; color: var(--green); font-size: 0.875rem; margin-top: 1rem; }
+
+/* FAQ */
+.faq-list { max-width: 720px; margin: 0 auto; }
+.faq-item { border-bottom: 1px solid var(--border-dim); }
+.faq-item:first-child { border-top: 1px solid var(--border-dim); }
+.faq-question { width: 100%; background: none; border: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 400; text-align: left; padding: 1.25rem 0; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 1rem; transition: color 0.2s; }
+.faq-question:hover { color: var(--purple-light); }
+.faq-arrow { color: var(--text-dim); font-size: 1.1rem; transition: transform 0.25s; flex-shrink: 0; }
+.faq-item.open .faq-arrow { transform: rotate(45deg); color: var(--purple-light); }
+.faq-answer { font-size: 0.875rem; color: var(--text-muted); line-height: 1.75; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
+.faq-item.open .faq-answer { max-height: 300px; padding-bottom: 1.25rem; }
+
+/* PRICING */
+.pricing-grid { max-width: 820px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.pricing-card { background: var(--bg2); border: 1px solid var(--border-dim); border-radius: 16px; padding: 2.5rem 2rem; }
+.pricing-card.featured { border-color: var(--purple); background: var(--bg3); position: relative; }
+.pricing-badge { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: var(--purple); color: #fff; font-size: 0.72rem; font-weight: 500; padding: 0.25rem 0.85rem; border-radius: 100px; white-space: nowrap; }
+.plan-name { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+.plan-price { font-family: 'Fraunces', serif; font-size: 3rem; font-weight: 300; line-height: 1; margin-bottom: 0.25rem; }
+.plan-price sup { font-size: 1.2rem; vertical-align: top; margin-top: 0.5rem; color: var(--text-muted); }
+.plan-period { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 2rem; }
+.plan-features { list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.plan-features li { font-size: 0.875rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.6rem; }
+.plan-features li::before { content: '✓'; color: var(--purple-light); font-size: 0.8rem; font-weight: 500; flex-shrink: 0; }
+.plan-btn { display: block; width: 100%; padding: 0.8rem; border-radius: 8px; text-align: center; font-size: 0.9rem; font-weight: 500; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.plan-btn-ghost { border: 1px solid var(--border); color: var(--text-muted); background: none; }
+.plan-btn-ghost:hover { border-color: var(--purple); color: var(--purple-light); }
+.plan-btn-primary { background: var(--purple); color: #fff; box-shadow: 0 0 24px rgba(124,111,224,0.3); }
+.plan-btn-primary:hover { background: var(--purple-light); }
+
+/* FOOTER */
+footer { border-top: 1px solid var(--border-dim); padding: 2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; }
+.footer-logo { font-family: 'Fraunces', serif; font-weight: 300; color: var(--text-muted); font-size: 1rem; }
+.footer-logo span { color: var(--purple-light); font-style: italic; }
+.footer-copy { font-size: 0.8rem; color: var(--text-dim); }
+
+/* LOGIN */
+.login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 2rem; }
+.login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 3rem 2.5rem; width: 100%; max-width: 420px; }
+.login-logo { font-family: 'Fraunces', serif; font-weight: 300; font-size: 1.6rem; text-align: center; margin-bottom: 0.5rem; }
+.login-logo span { color: var(--purple-light); font-style: italic; }
+.login-sub { text-align: center; color: var(--text-dim); font-size: 0.85rem; margin-bottom: 2.5rem; }
+.form-group { margin-bottom: 1.25rem; }
+.form-label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+.form-input { width: 100%; background: var(--bg3); border: 1px solid var(--border-dim); border-radius: 8px; padding: 0.75rem 1rem; color: var(--text); font-size: 0.9rem; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; outline: none; }
+.form-input:focus { border-color: var(--purple); }
+.form-input::placeholder { color: var(--text-dim); }
+.login-btn { width: 100%; background: var(--purple); color: #fff; border: none; border-radius: 8px; padding: 0.85rem; font-size: 0.95rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; margin-top: 0.5rem; }
+.login-btn:hover { background: var(--purple-light); }
+.login-error { background: rgba(240,112,112,0.1); border: 1px solid rgba(240,112,112,0.3); color: var(--red); font-size: 0.82rem; padding: 0.6rem 0.85rem; border-radius: 6px; margin-bottom: 1rem; display: none; }
+.login-back { text-align: center; margin-top: 1.5rem; }
+.login-back a { color: var(--text-dim); font-size: 0.82rem; cursor: pointer; }
+.login-back a:hover { color: var(--text-muted); }
+
+/* ADMIN */
+.admin-sidebar { background: var(--bg2); border-right: 1px solid var(--border-dim); padding: 1.5rem 1rem; position: fixed; top: 0; left: 0; bottom: 0; width: 240px; display: flex; flex-direction: column; gap: 0.25rem; overflow-y: auto; z-index: 50; }
+.admin-brand { font-family: 'Fraunces', serif; font-weight: 300; font-size: 1.25rem; padding: 0.5rem 0.75rem 1.5rem; color: var(--text); }
+.admin-brand span { color: var(--purple-light); font-style: italic; }
+.sidebar-section-label { font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.75rem 0.75rem 0.35rem; }
+.sidebar-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.75rem; border-radius: 8px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; transition: all 0.15s; border: none; background: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; }
+.sidebar-item:hover { background: var(--bg3); color: var(--text); }
+.sidebar-item.active { background: var(--purple-dim); color: var(--purple-light); }
+.sidebar-bottom { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-dim); }
+.admin-main { margin-left: 240px; padding: 2.5rem; min-height: 100vh; }
+.admin-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem; }
+.admin-title { font-family: 'Fraunces', serif; font-weight: 300; font-size: 1.75rem; letter-spacing: -0.02em; }
+.admin-title em { font-style: italic; color: var(--purple-light); }
+.admin-panel { display: none; }
+.admin-panel.active { display: block; }
+.metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.metric-card { background: var(--bg2); border: 1px solid var(--border-dim); border-radius: 12px; padding: 1.25rem 1.5rem; }
+.metric-label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.metric-val { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 300; color: var(--text); }
+.metric-change { font-size: 0.75rem; margin-top: 0.25rem; }
+.metric-up { color: var(--green); }
+.admin-card { background: var(--bg2); border: 1px solid var(--border-dim); border-radius: 14px; overflow: hidden; margin-bottom: 1.5rem; }
+.admin-card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-dim); display: flex; align-items: center; justify-content: space-between; }
+.admin-card-title { font-size: 0.9rem; font-weight: 500; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { font-size: 0.72rem; text-align: left; color: var(--text-dim); padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border-dim); font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; }
+.data-table td { padding: 0.9rem 1.5rem; font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid var(--border-dim); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table td:first-child { color: var(--text); }
+.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+.badge { display: inline-block; font-size: 0.7rem; font-weight: 500; padding: 0.2rem 0.55rem; border-radius: 4px; }
+.badge-purple { background: var(--purple-dim); color: var(--purple-light); }
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.settings-card { background: var(--bg2); border: 1px solid var(--border-dim); border-radius: 14px; padding: 2rem; }
+.settings-card-title { font-size: 1rem; font-weight: 500; margin-bottom: 0.35rem; }
+.settings-card-desc { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+.settings-field { margin-bottom: 1.25rem; }
+.settings-label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+.settings-input { width: 100%; background: var(--bg3); border: 1px solid var(--border-dim); border-radius: 8px; padding: 0.65rem 0.9rem; color: var(--text); font-size: 0.875rem; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
+.settings-input:focus { border-color: var(--purple); }
+.settings-input::placeholder { color: var(--text-dim); }
+.settings-textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border-dim); border-radius: 8px; padding: 0.65rem 0.9rem; color: var(--text); font-size: 0.875rem; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; resize: vertical; min-height: 80px; line-height: 1.6; }
+.settings-textarea:focus { border-color: var(--purple); }
+.save-btn { background: var(--purple); color: #fff; border: none; border-radius: 8px; padding: 0.65rem 1.5rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+.save-btn:hover { background: var(--purple-light); }
+.save-success { display: none; color: var(--green); font-size: 0.8rem; margin-top: 0.5rem; }
+.stripe-box { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+.stripe-logo { font-size: 1.5rem; font-weight: 700; color: #635bff; font-family: 'DM Sans', sans-serif; flex-shrink: 0; }
+.stripe-info { flex: 1; }
+.stripe-info strong { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.25rem; }
+.stripe-info p { font-size: 0.82rem; color: var(--text-muted); }
+.stripe-btn { background: #635bff; color: #fff; border: none; border-radius: 8px; padding: 0.6rem 1.25rem; font-size: 0.85rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; flex-shrink: 0; transition: background 0.2s; }
+.stripe-btn.connected { background: rgba(93,219,144,0.15); color: var(--green); border: 1px solid rgba(93,219,144,0.3); cursor: default; }
+.plan-link-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.plan-link-label { font-size: 0.82rem; color: var(--text-muted); width: 100px; flex-shrink: 0; }
+.plan-link-input { flex: 1; background: var(--bg3); border: 1px solid var(--border-dim); border-radius: 8px; padding: 0.6rem 0.9rem; color: var(--text); font-size: 0.82rem; font-family: monospace; outline: none; transition: border-color 0.2s; }
+.plan-link-input:focus { border-color: var(--purple); }
+.plan-link-input::placeholder { color: var(--text-dim); }
+.export-btn { background: none; border: 1px solid var(--border-dim); color: var(--text-muted); padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.export-btn:hover { border-color: var(--border); color: var(--text); }
+.add-btn { background: var(--purple-dim); color: var(--purple-light); border: 1px solid var(--border); padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.add-btn:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+.content-editor { background: var(--bg3); border: 1px solid var(--border-dim); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+.content-editor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+.remove-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.8rem; font-family: 'DM Sans', sans-serif; transition: color 0.2s; padding: 0; }
+.remove-btn:hover { color: var(--red); }
+.editor-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 900px) {
+  .admin-sidebar { width: 200px; }
+  .admin-main { margin-left: 200px; padding: 1.5rem; }
+  .metrics-row { grid-template-columns: repeat(2, 1fr); }
+  .settings-grid, .features-grid, .testimonials-grid, .pricing-grid { grid-template-columns: 1fr; }
+  .capture-form { flex-direction: column; }
+  .editor-row { grid-template-columns: 1fr; }
+  nav { padding: 1rem 1.25rem; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LANDING PAGE ═══════════════ -->
+<div id="page-landing" class="page active">
+  <nav>
+    <span class="nav-logo" onclick="showPage('page-landing')">Sell<span>ara</span></span>
+    <ul class="nav-links">
+      <li><a onclick="scrollTo('features-section')">Features</a></li>
+      <li><a onclick="scrollTo('testimonials-section')">Reviews</a></li>
+      <li><a onclick="scrollTo('faq-section')">FAQ</a></li>
+      <li><a onclick="scrollTo('pricing-section')">Pricing</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-admin-btn" onclick="showPage('page-login')">Admin ↗</button>
+      <button class="nav-cta" onclick="scrollTo('capture-section')">Join waitlist</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-badge">Now in early access</div>
+    <h1>Find winning products.<br><em>Market them faster.</em></h1>
+    <p class="hero-sub">Sellara surfaces trending products for Shopify and TikTok Shop — then tells you exactly who to target and what to say.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="scrollTo('capture-section')">Join the waitlist</button>
+      <button class="btn-ghost" onclick="scrollTo('features-section')">See how it works</button>
+    </div>
+    <p class="hero-note">No credit card required &nbsp;·&nbsp; Cancel anytime</p>
+  </section>
+
+  <div class="stats-bar">
+    <div class="stat-item"><span class="stat-num">12k+</span><span class="stat-label">Products tracked daily</span></div>
+    <div class="stat-item"><span class="stat-num">3.2x</span><span class="stat-label">Avg. ROAS improvement</span></div>
+    <div class="stat-item"><span class="stat-num">94%</span><span class="stat-label">Trend detection accuracy</span></div>
+    <div class="stat-item"><span class="stat-num">&lt;2 min</span><span class="stat-label">From product to ad copy</span></div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="section" id="features-section">
+    <p class="section-label">What's inside</p>
+    <h2>Three tools. <em>One workflow.</em></h2>
+    <p class="section-sub">Everything you need to go from idea to live ad — without the guesswork.</p>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">📡</div><div class="feature-title">Winning Product Finder</div><p class="feature-desc">Real-time trend detection across AliExpress, TikTok Shop, and Shopify. Filter by niche, competition, margin, and viral velocity.</p></div>
+      <div class="feature-card"><div class="feature-icon">🎯</div><div class="feature-title">Audience Suggester</div><p class="feature-desc">Instantly generate Meta and TikTok audience personas — interests, demographics, and behavioral targeting all included.</p></div>
+      <div class="feature-card"><div class="feature-icon">✍️</div><div class="feature-title">Ad Copy Generator</div><p class="feature-desc">Get hooks, headlines, body copy, and video scripts ready to launch. Tuned for TikTok short-form and Meta feed formats.</p></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section style="padding:6rem 2rem;background:var(--bg2);">
+    <p class="section-label">The process</p>
+    <h2>Zero to <em>live campaign</em> in minutes</h2>
+    <p class="section-sub" style="margin-bottom:3rem">No experience needed.</p>
+    <div style="max-width:700px;margin:0 auto;">
+      <div style="display:grid;grid-template-columns:60px 1fr;gap:1.5rem;padding:2rem 0;border-bottom:1px solid var(--border-dim);"><div style="font-family:'Fraunces',serif;font-size:2.5rem;font-weight:300;color:var(--purple-dim);line-height:1;">01</div><div><div style="font-size:1.05rem;font-weight:500;margin-bottom:0.4rem;">Search trending products</div><p style="font-size:0.875rem;color:var(--text-muted);">Filter by niche, platform, competition, or trend velocity. See what's gaining traction right now.</p></div></div>
+      <div style="display:grid;grid-template-columns:60px 1fr;gap:1.5rem;padding:2rem 0;border-bottom:1px solid var(--border-dim);"><div style="font-family:'Fraunces',serif;font-size:2.5rem;font-weight:300;color:var(--purple-dim);line-height:1;">02</div><div><div style="font-size:1.05rem;font-weight:500;margin-bottom:0.4rem;">Get your target audience</div><p style="font-size:0.875rem;color:var(--text-muted);">Click any product and get a full audience profile — age ranges, interests, and platform targeting suggestions.</p></div></div>
+      <div style="display:grid;grid-template-columns:60px 1fr;gap:1.5rem;padding:2rem 0;"><div style="font-family:'Fraunces',serif;font-size:2.5rem;font-weight:300;color:var(--purple-dim);line-height:1;">03</div><div><div style="font-size:1.05rem;font-weight:500;margin-bottom:0.4rem;">Generate ad copy & launch</div><p style="font-size:0.875rem;color:var(--text-muted);">Choose TikTok hook, Meta headline, or video script. Multiple variations. Copy, paste, run.</p></div></div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section" id="testimonials-section">
+    <p class="section-label">Real results</p>
+    <h2>What dropshippers <em>are saying</em></h2>
+    <p class="section-sub">Join sellers already using Sellara to find winning products faster.</p>
+    <div class="testimonials-grid" id="testimonials-grid"></div>
+  </section>
+
+  <!-- EMAIL CAPTURE -->
+  <section class="capture-section" id="capture-section">
+    <div class="capture-inner">
+      <p class="section-label">Early access</p>
+      <h2>Get <em>early access</em></h2>
+      <p style="color:var(--text-muted);font-size:0.95rem;margin-top:0.5rem;">Join the waitlist and be first to know when Sellara launches.</p>
+      <div class="capture-form">
+        <input class="capture-input" type="email" id="capture-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')submitCapture()" />
+        <button class="capture-btn" onclick="submitCapture()">Join waitlist</button>
+      </div>
+      <div class="capture-success" id="capture-success">🎉 You're on the list! We'll be in touch soon.</div>
+      <p class="capture-note">No credit card. No spam. Just early access.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq-section">
+    <p class="section-label">Questions</p>
+    <h2>Frequently asked <em>questions</em></h2>
+    <p class="section-sub">Everything you need to know before getting started.</p>
+    <div class="faq-list" id="faq-list"></div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section" id="pricing-section">
+    <p class="section-label">Pricing</p>
+    <h2>Simple, <em>transparent</em> pricing</h2>
+    <p class="section-sub">Start free for 14 days. No card needed.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price"><sup>$</sup>49</div>
+        <div class="plan-period">per month</div>
+        <ul class="plan-features"><li>50 product searches / month</li><li>Audience profiles included</li><li>100 ad copy generations</li><li>Shopify + TikTok Shop</li><li>Email support</li></ul>
+        <button class="plan-btn plan-btn-ghost" onclick="handleCheckout('starter')">Start free trial</button>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-badge">Most popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price"><sup>$</sup>97</div>
+        <div class="plan-period">per month</div>
+        <ul class="plan-features"><li>Unlimited product searches</li><li>Advanced audience targeting</li><li>Unlimited ad generations</li><li>Competitor ad spy tool</li><li>Saved lists &amp; export</li><li>Priority support</li></ul>
+        <button class="plan-btn plan-btn-primary" onclick="handleCheckout('pro')">Start free trial</button>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:1.25rem;font-size:0.8rem;color:var(--text-dim);">Payments processed securely by Stripe &nbsp;·&nbsp; Cancel anytime</p>
+  </section>
+
+  <section style="padding:5rem 2rem;text-align:center;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(124,111,224,0.08),transparent 70%);pointer-events:none;"></div>
+    <h2>Ready to find your next<br><em>winning product?</em></h2>
+    <p style="color:var(--text-muted);margin:1rem 0 2rem;">Join hundreds of dropshippers already using Sellara.</p>
+    <button class="btn-primary" onclick="scrollTo('capture-section')">Join the waitlist</button>
+  </section>
+
+  <footer>
+    <div class="footer-logo">Sell<span>ara</span></div>
+    <div class="footer-copy">© 2025 Sellara. All rights reserved.</div>
+    <span style="font-size:0.8rem;color:var(--text-dim);cursor:pointer;" onclick="showPage('page-login')">Admin</span>
+  </footer>
+</div>
+
+
+<!-- ═══════════════ LOGIN ═══════════════ -->
+<div id="page-login" class="page">
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-logo">Sell<span>ara</span></div>
+      <div class="login-sub">Admin dashboard access</div>
+      <div class="login-error" id="login-error">Incorrect email or password.</div>
+      <div class="form-group"><label class="form-label">Email address</label><input class="form-input" type="email" id="login-email" placeholder="admin@sellara.io" /></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" /></div>
+      <button class="login-btn" onclick="doLogin()">Sign in to dashboard</button>
+      <div class="login-back"><a onclick="showPage('page-landing')">← Back to Sellara</a></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ ADMIN ═══════════════ -->
+<div id="page-admin" class="page">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">Sell<span>ara</span></div>
+    <div class="sidebar-section-label">Overview</div>
+    <button class="sidebar-item active" onclick="switchPanel('panel-overview',this)"><span>◈</span> Dashboard</button>
+    <button class="sidebar-item" onclick="switchPanel('panel-subscribers',this)"><span>◎</span> Subscribers</button>
+    <button class="sidebar-item" onclick="switchPanel('panel-waitlist',this)"><span>◻</span> Waitlist</button>
+    <button class="sidebar-item" onclick="switchPanel('panel-revenue',this)"><span>◷</span> Revenue</button>
+    <div class="sidebar-section-label">Content</div>
+    <button class="sidebar-item" onclick="switchPanel('panel-testimonials',this)"><span>★</span> Testimonials</button>
+    <button class="sidebar-item" onclick="switchPanel('panel-faq',this)"><span>?</span> FAQ</button>
+    <div class="sidebar-section-label">Settings</div>
+    <button class="sidebar-item" onclick="switchPanel('panel-stripe',this)"><span>💳</span> Stripe & Payments</button>
+    <button class="sidebar-item" onclick="switchPanel('panel-settings',this)"><span>◱</span> Account Settings</button>
+    <div class="sidebar-bottom">
+      <button class="sidebar-item" onclick="showPage('page-landing')" style="color:var(--text-dim);"><span>←</span> View site</button>
+      <button class="sidebar-item" onclick="doLogout()" style="color:var(--red);"><span>↩</span> Sign out</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+
+    <!-- OVERVIEW -->
+    <div id="panel-overview" class="admin-panel active">
+      <div class="admin-topbar">
+        <div class="admin-title">Good to see you, <em>Martin</em></div>
+        <div style="font-size:0.82rem;color:var(--text-dim);" id="admin-date"></div>
+      </div>
+      <div class="metrics-row">
+        <div class="metric-card"><div class="metric-label">MRR</div><div class="metric-val">$0</div><div class="metric-change metric-up">↑ Getting started</div></div>
+        <div class="metric-card"><div class="metric-label">Active subscribers</div><div class="metric-val">0</div><div class="metric-change" style="color:var(--text-dim)">Launch mode</div></div>
+        <div class="metric-card"><div class="metric-label">Waitlist signups</div><div class="metric-val" id="overview-waitlist-count">0</div><div class="metric-change metric-up">↑ Growing</div></div>
+        <div class="metric-card"><div class="metric-label">Stripe status</div><div class="metric-val" style="font-size:1.1rem;padding-top:0.4rem;" id="overview-stripe-status">Not connected</div><div class="metric-change" style="color:var(--text-dim);cursor:pointer;" onclick="switchPanel('panel-stripe',null)">Configure →</div></div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-header"><span class="admin-card-title">Setup checklist</span></div>
+        <div style="padding:1.5rem;display:flex;flex-direction:column;gap:0.85rem;">
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.875rem;"><span style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;color:var(--text-dim);">1</span><span style="color:var(--text-muted);">Connect Stripe to accept payments</span><span style="margin-left:auto;cursor:pointer;font-size:0.78rem;color:var(--purple-light);" onclick="switchPanel('panel-stripe',null)">Set up →</span></div>
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.875rem;"><span style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;color:var(--text-dim);">2</span><span style="color:var(--text-muted);">Add your Stripe payment links for each plan</span><span style="margin-left:auto;cursor:pointer;font-size:0.78rem;color:var(--purple-light);" onclick="switchPanel('panel-stripe',null)">Set up →</span></div>
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.875rem;"><span style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;color:var(--text-dim);">3</span><span style="color:var(--text-muted);">Add real customer testimonials to build trust</span><span style="margin-left:auto;cursor:pointer;font-size:0.78rem;color:var(--purple-light);" onclick="switchPanel('panel-testimonials',null)">Edit →</span></div>
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.875rem;"><span style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;color:var(--text-dim);">4</span><span style="color:var(--text-muted);">Customize your FAQ with real customer questions</span><span style="margin-left:auto;cursor:pointer;font-size:0.78rem;color:var(--purple-light);" onclick="switchPanel('panel-faq',null)">Edit →</span></div>
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.875rem;"><span style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;color:var(--text-dim);">5</span><span style="color:var(--text-muted);">Change your admin password from the default</span><span style="margin-left:auto;cursor:pointer;font-size:0.78rem;color:var(--purple-light);" onclick="switchPanel('panel-settings',null)">Set up →</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBSCRIBERS -->
+    <div id="panel-subscribers" class="admin-panel">
+      <div class="admin-topbar"><div class="admin-title"><em>Subscribers</em></div></div>
+      <div class="admin-card">
+        <div class="admin-card-header"><span class="admin-card-title">All subscribers</span><span style="font-size:0.8rem;color:var(--text-dim);">Synced from Stripe</span></div>
+        <table class="data-table"><thead><tr><th>Email</th><th>Plan</th><th>Status</th><th>MRR</th><th>Since</th></tr></thead><tbody><tr><td colspan="5" style="text-align:center;padding:3rem;color:var(--text-dim);font-size:0.875rem;">No subscribers yet. Connect Stripe and share your site to get started.</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- WAITLIST -->
+    <div id="panel-waitlist" class="admin-panel">
+      <div class="admin-topbar"><div class="admin-title"><em>Waitlist</em></div><button class="export-btn" onclick="exportWaitlist()">Export CSV</button></div>
+      <div style="display:grid;grid-template-columns:200px 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+        <div class="metric-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;"><div class="metric-label">Total signups</div><div style="font-family:'Fraunces',serif;font-size:3.5rem;font-weight:300;color:var(--purple-light);" id="waitlist-total">0</div></div>
+        <div class="admin-card" style="margin-bottom:0;"><div class="admin-card-header"><span class="admin-card-title">Add signup manually</span></div><div style="padding:1.25rem;display:flex;gap:0.75rem;align-items:flex-end;"><div style="flex:1;"><div class="settings-label">Email address</div><input class="settings-input" type="email" id="waitlist-email-input" placeholder="someone@example.com" /></div><button class="save-btn" onclick="addWaitlistEntry()">Add</button></div></div>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-header"><span class="admin-card-title">Waitlist entries</span></div>
+        <table class="data-table"><thead><tr><th>Email</th><th>Date</th><th>Source</th><th></th></tr></thead><tbody id="waitlist-tbody"><tr><td colspan="4" style="text-align:center;padding:3rem;color:var(--text-dim);font-size:0.875rem;">No signups yet.</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- REVENUE -->
+    <div id="panel-revenue" class="admin-panel">
+      <div class="admin-topbar"><div class="admin-title"><em>Revenue</em></div></div>
+      <div class="metrics-row">
+        <div class="metric-card"><div class="metric-label">MRR</div><div class="metric-val">$0</div></div>
+        <div class="metric-card"><div class="metric-label">ARR</div><div class="metric-val">$0</div></div>
+        <div class="metric-card"><div class="metric-label">Total collected</div><div class="metric-val">$0</div></div>
+        <div class="metric-card"><div class="metric-label">Avg revenue/user</div><div class="metric-val">—</div></div>
+      </div>
+      <div class="admin-card"><div class="admin-card-header"><span class="admin-card-title">Transactions</span></div><table class="data-table"><thead><tr><th>Date</th><th>Customer</th><th>Plan</th><th>Amount</th><th>Status</th></tr></thead><tbody><tr><td colspan="5" style="text-align:center;padding:3rem;color:var(--text-dim);font-size:0.875rem;">No transactions yet. Connect Stripe to see revenue data.</td></tr></tbody></table></div>
+    </div>
+
+    <!-- TESTIMONIALS MANAGER -->
+    <div id="panel-testimonials" class="admin-panel">
+      <div class="admin-topbar">
+        <div class="admin-title"><em>Testimonials</em></div>
+        <button class="add-btn" onclick="addTestimonial()">+ Add testimonial</button>
+      </div>
+      <div class="admin-card" style="margin-bottom:1.5rem;">
+        <div class="admin-card-header"><span class="admin-card-title">How it works</span></div>
+        <div style="padding:1.25rem;font-size:0.85rem;color:var(--text-muted);line-height:1.7;">Edit the testimonials below and click <strong style="color:var(--text);">Save changes</strong> — they update on your landing page instantly. Replace placeholders with real customer quotes as you get them.</div>
+      </div>
+      <div id="testimonials-editor"></div>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button class="save-btn" onclick="saveTestimonials()">Save changes</button>
+        <span class="save-success" id="testimonials-saved">✓ Testimonials updated on your site</span>
+      </div>
+    </div>
+
+    <!-- FAQ MANAGER -->
+    <div id="panel-faq" class="admin-panel">
+      <div class="admin-topbar">
+        <div class="admin-title"><em>FAQ</em></div>
+        <button class="add-btn" onclick="addFaq()">+ Add question</button>
+      </div>
+      <div class="admin-card" style="margin-bottom:1.5rem;">
+        <div class="admin-card-header"><span class="admin-card-title">How it works</span></div>
+        <div style="padding:1.25rem;font-size:0.85rem;color:var(--text-muted);line-height:1.7;">Add, edit, or remove FAQ items. Click <strong style="color:var(--text);">Save changes</strong> to publish to your landing page. Answer real questions your visitors ask.</div>
+      </div>
+      <div id="faq-editor"></div>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button class="save-btn" onclick="saveFaq()">Save changes</button>
+        <span class="save-success" id="faq-saved">✓ FAQ updated on your site</span>
+      </div>
+    </div>
+
+    <!-- STRIPE -->
+    <div id="panel-stripe" class="admin-panel">
+      <div class="admin-topbar"><div class="admin-title">Stripe & <em>Payments</em></div></div>
+      <div class="stripe-box">
+        <div class="stripe-logo">stripe</div>
+        <div class="stripe-info"><strong>Connect your Stripe account</strong><p>All payments go directly to your Stripe. You keep 100% of revenue.</p></div>
+        <button class="stripe-btn" id="stripe-connect-btn" onclick="connectStripe()">Connect Stripe →</button>
+      </div>
+      <div class="admin-card">
+        <div class="admin-card-header"><span class="admin-card-title">Payment links</span><span style="font-size:0.78rem;color:var(--text-dim);">From your Stripe Dashboard</span></div>
+        <div style="padding:1.5rem;">
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.6;">Go to <span style="color:var(--purple-light);cursor:pointer;" onclick="window.open('https://dashboard.stripe.com/payment-links','_blank')">dashboard.stripe.com → Payment Links</span>, create one for each plan, then paste the links below.</p>
+          <div style="background:var(--bg3);border:1px solid var(--border-dim);border-radius:10px;padding:1.25rem;margin-bottom:1.25rem;">
+            <div style="font-size:0.78rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.75rem;">Quick steps</div>
+            <div style="font-size:0.82rem;color:var(--text-muted);display:flex;flex-direction:column;gap:0.5rem;">
+              <div><span style="color:var(--purple-light);">1.</span> Stripe Dashboard → Products → Payment Links → Create link</div>
+              <div><span style="color:var(--purple-light);">2.</span> Set price to $49/mo for Starter, $97/mo for Pro</div>
+              <div><span style="color:var(--purple-light);">3.</span> Copy the link (starts with https://buy.stripe.com/...)</div>
+              <div><span style="color:var(--purple-light);">4.</span> Paste below and hit Save — checkout buttons go live instantly</div>
+            </div>
+          </div>
+          <div class="plan-link-row"><span class="plan-link-label">Starter ($49)</span><input class="plan-link-input" id="link-starter" type="url" placeholder="https://buy.stripe.com/..." /></div>
+          <div class="plan-link-row"><span class="plan-link-label">Pro ($97)</span><input class="plan-link-input" id="link-pro" type="url" placeholder="https://buy.stripe.com/..." /></div>
+          <div style="margin-top:1.25rem;display:flex;align-items:center;gap:1rem;">
+            <button class="save-btn" onclick="savePaymentLinks()">Save payment links</button>
+            <span class="save-success" id="links-saved">✓ Links saved — checkout is live</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="panel-settings" class="admin-panel">
+      <div class="admin-topbar"><div class="admin-title">Account <em>Settings</em></div></div>
+      <div class="settings-grid">
+        <div class="settings-card">
+          <div class="settings-card-title">Admin credentials</div>
+          <div class="settings-card-desc">Update your login email and password.</div>
+          <div class="settings-field"><label class="settings-label">Admin email</label><input class="settings-input" type="email" id="settings-email" /></div>
+          <div class="settings-field"><label class="settings-label">New password</label><input class="settings-input" type="password" id="settings-pass" placeholder="Enter new password" /></div>
+          <div class="settings-field"><label class="settings-label">Confirm password</label><input class="settings-input" type="password" id="settings-pass2" placeholder="Confirm new password" /></div>
+          <button class="save-btn" onclick="saveCredentials()">Update credentials</button>
+          <div class="save-success" id="creds-saved">✓ Credentials updated</div>
+          <div style="display:none;color:var(--red);font-size:0.8rem;margin-top:0.5rem;" id="creds-error"></div>
+        </div>
+        <div class="settings-card">
+          <div class="settings-card-title">Business info</div>
+          <div class="settings-card-desc">Used on invoices and emails sent to customers.</div>
+          <div class="settings-field"><label class="settings-label">Business name</label><input class="settings-input" id="biz-name" placeholder="Sellara Inc." /></div>
+          <div class="settings-field"><label class="settings-label">Support email</label><input class="settings-input" type="email" id="biz-email" placeholder="support@sellara.io" /></div>
+          <div class="settings-field"><label class="settings-label">Website</label><input class="settings-input" type="url" id="biz-url" placeholder="https://sellara.io" /></div>
+          <button class="save-btn" onclick="saveBizInfo()">Save info</button>
+          <div class="save-success" id="biz-saved">✓ Info saved</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── DEFAULTS ──
+const DEFAULT_TESTIMONIALS = [
+  { name: 'Jordan M.', role: 'Shopify seller, 8 months', avatar: 'JM', stars: 5, text: 'Found my first winning product in under 10 minutes. The audience suggester alone saved me hours of research every week.' },
+  { name: 'Priya S.', role: 'TikTok Shop seller', avatar: 'PS', stars: 5, text: 'The ad copy generator is insane. I used to spend hours writing hooks. Now I get 5 variations in seconds and just pick the best one.' },
+  { name: 'Chris T.', role: 'Full-time dropshipper', avatar: 'CT', stars: 5, text: "Switched from a $200/mo tool to Sellara and the product research is better. The marketing angle feature is something I haven't seen anywhere else." }
+];
+
+const DEFAULT_FAQS = [
+  { q: 'Does Sellara work for beginners?', a: "Absolutely. Sellara was built with beginners in mind. You don't need any experience — the platform guides you from finding a product to having ad copy ready to launch." },
+  { q: 'What platforms does Sellara support?', a: 'Sellara supports both Shopify and TikTok Shop. Product data, audience targeting, and ad copy are optimized for both platforms.' },
+  { q: 'How is Sellara different from other tools?', a: 'Most tools only do product research. Sellara combines product discovery, audience targeting, and ad copy generation into one workflow — from idea to live campaign in minutes, not hours.' },
+  { q: 'Can I cancel anytime?', a: 'Yes, completely. No contracts, no cancellation fees. Cancel from your account settings and keep access until the end of your billing period.' },
+  { q: 'Is there a free trial?', a: 'Yes! 14-day free trial on any plan, no credit card required. Try every feature and only pay if you love it.' },
+  { q: 'How does the ad copy generator work?', a: 'Once you select a product and an audience is generated, Sellara creates multiple ad variations — TikTok hooks, Meta headlines, video scripts. Pick what works and launch.' }
+];
+
+// ── STATE ──
+const STATE = {
+  admin: { email: 'admin@sellara.io', password: 'sellara2025' },
+  stripeLinks: { starter: '', pro: '' },
+  waitlist: [],
+  stripeConnected: false,
+  testimonials: [...DEFAULT_TESTIMONIALS],
+  faqs: [...DEFAULT_FAQS]
+};
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('sellara_v3') || '{}');
+    if (s.admin) STATE.admin = s.admin;
+    if (s.stripeLinks) STATE.stripeLinks = s.stripeLinks;
+    if (s.waitlist) STATE.waitlist = s.waitlist;
+    if (s.stripeConnected) STATE.stripeConnected = s.stripeConnected;
+    if (s.testimonials) STATE.testimonials = s.testimonials;
+    if (s.faqs) STATE.faqs = s.faqs;
+  } catch(e) {}
+}
+
+function saveState() {
+  try { localStorage.setItem('sellara_v3', JSON.stringify(STATE)); } catch(e) {}
+}
+
+// ── NAV HELPERS ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function scrollTo(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── RENDER LANDING ──
+function renderTestimonials() {
+  const g = document.getElementById('testimonials-grid');
+  if (!g) return;
+  g.innerHTML = STATE.testimonials.map(t => `
+    <div class="testimonial-card">
+      <div class="testimonial-stars">${'★'.repeat(t.stars)}${'☆'.repeat(5-t.stars)}</div>
+      <div class="testimonial-text">"${t.text}"</div>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">${t.avatar}</div>
+        <div><div class="testimonial-name">${t.name}</div><div class="testimonial-role">${t.role}</div></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderFaq() {
+  const list = document.getElementById('faq-list');
+  if (!list) return;
+  list.innerHTML = STATE.faqs.map((f, i) => `
+    <div class="faq-item" id="faq-${i}">
+      <button class="faq-question" onclick="toggleFaq(${i})">
+        <span>${f.q}</span><span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-answer">${f.a}</div>
+    </div>`).join('');
+}
+
+function toggleFaq(i) {
+  const item = document.getElementById('faq-' + i);
+  const open = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+  if (!open) item.classList.add('open');
+}
+
+// ── EMAIL CAPTURE ──
+function submitCapture() {
+  const input = document.getElementById('capture-email');
+  const email = input.value.trim();
+  if (!email || !email.includes('@')) { input.style.borderColor = 'var(--red)'; setTimeout(() => input.style.borderColor = '', 1500); return; }
+  STATE.waitlist.unshift({ email, date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}), source: 'Landing page' });
+  saveState();
+  input.value = '';
+  document.getElementById('capture-success').style.display = 'block';
+}
+
+// ── LOGIN ──
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  if (email === STATE.admin.email && pass === STATE.admin.password) {
+    err.style.display = 'none';
+    showPage('page-admin');
+    initAdmin();
+  } else { err.style.display = 'block'; }
+}
+
+function doLogout() {
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+  showPage('page-login');
+}
+
+// ── ADMIN INIT ──
+function initAdmin() {
+  document.getElementById('admin-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('overview-waitlist-count').textContent = STATE.waitlist.length;
+  document.getElementById('overview-stripe-status').textContent = STATE.stripeConnected ? 'Connected ✓' : 'Not connected';
+  document.getElementById('overview-stripe-status').style.color = STATE.stripeConnected ? 'var(--green)' : 'var(--text-muted)';
+}
+
+function switchPanel(id, btn) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) { document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+  const actions = { 'panel-stripe': loadStripePanel, 'panel-waitlist': renderWaitlistAdmin, 'panel-settings': loadSettings, 'panel-testimonials': renderTestimonialsEditor, 'panel-faq': renderFaqEditor };
+  if (actions[id]) actions[id]();
+}
+
+// ── TESTIMONIALS ADMIN ──
+function renderTestimonialsEditor() {
+  document.getElementById('testimonials-editor').innerHTML = STATE.testimonials.map((t, i) => `
+    <div class="content-editor">
+      <div class="content-editor-header"><span>Testimonial ${i+1}</span><button class="remove-btn" onclick="removeTestimonial(${i})">✕ Remove</button></div>
+      <div class="editor-row">
+        <div><div class="settings-label">Name</div><input class="settings-input" value="${t.name}" onchange="STATE.testimonials[${i}].name=this.value" /></div>
+        <div><div class="settings-label">Role / description</div><input class="settings-input" value="${t.role}" onchange="STATE.testimonials[${i}].role=this.value" /></div>
+      </div>
+      <div class="editor-row">
+        <div><div class="settings-label">Initials (2 letters)</div><input class="settings-input" value="${t.avatar}" maxlength="2" onchange="STATE.testimonials[${i}].avatar=this.value" /></div>
+        <div><div class="settings-label">Star rating (1–5)</div><input class="settings-input" type="number" min="1" max="5" value="${t.stars}" onchange="STATE.testimonials[${i}].stars=parseInt(this.value)" /></div>
+      </div>
+      <div><div class="settings-label">Review text</div><textarea class="settings-textarea" onchange="STATE.testimonials[${i}].text=this.value">${t.text}</textarea></div>
+    </div>`).join('');
+}
+
+function removeTestimonial(i) { STATE.testimonials.splice(i,1); renderTestimonialsEditor(); }
+function addTestimonial() {
+  STATE.testimonials.push({name:'New Customer',role:'Dropshipper',avatar:'NC',stars:5,text:'Add your customer review here.'});
+  renderTestimonialsEditor();
+  document.getElementById('testimonials-editor').lastElementChild.scrollIntoView({behavior:'smooth'});
+}
+function saveTestimonials() {
+  saveState(); renderTestimonials();
+  const el = document.getElementById('testimonials-saved'); el.style.display='inline';
+  setTimeout(()=>el.style.display='none',3000);
+}
+
+// ── FAQ ADMIN ──
+function renderFaqEditor() {
+  document.getElementById('faq-editor').innerHTML = STATE.faqs.map((f,i) => `
+    <div class="content-editor">
+      <div class="content-editor-header"><span>Question ${i+1}</span><button class="remove-btn" onclick="removeFaq(${i})">✕ Remove</button></div>
+      <div class="settings-field"><div class="settings-label">Question</div><input class="settings-input" value="${f.q}" onchange="STATE.faqs[${i}].q=this.value" /></div>
+      <div class="settings-field" style="margin-bottom:0"><div class="settings-label">Answer</div><textarea class="settings-textarea" onchange="STATE.faqs[${i}].a=this.value">${f.a}</textarea></div>
+    </div>`).join('');
+}
+
+function removeFaq(i) { STATE.faqs.splice(i,1); renderFaqEditor(); }
+function addFaq() {
+  STATE.faqs.push({q:'New question?',a:'Add your answer here.'});
+  renderFaqEditor();
+  document.getElementById('faq-editor').lastElementChild.scrollIntoView({behavior:'smooth'});
+}
+function saveFaq() {
+  saveState(); renderFaq();
+  const el = document.getElementById('faq-saved'); el.style.display='inline';
+  setTimeout(()=>el.style.display='none',3000);
+}
+
+// ── WAITLIST ADMIN ──
+function renderWaitlistAdmin() {
+  const tbody = document.getElementById('waitlist-tbody');
+  document.getElementById('waitlist-total').textContent = STATE.waitlist.length;
+  if (!STATE.waitlist.length) { tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:3rem;color:var(--text-dim);font-size:0.875rem;">No signups yet.</td></tr>'; return; }
+  tbody.innerHTML = STATE.waitlist.map((e,i) => `
+    <tr>
+      <td>${e.email}</td>
+      <td style="color:var(--text-dim)">${e.date}</td>
+      <td><span class="badge badge-purple">${e.source}</span></td>
+      <td style="text-align:right"><button onclick="removeWaitlist(${i})" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:0.8rem;font-family:'DM Sans',sans-serif;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text-dim)'">Remove</button></td>
+    </tr>`).join('');
+}
+
+function addWaitlistEntry() {
+  const input = document.getElementById('waitlist-email-input');
+  const email = input.value.trim();
+  if (!email || !email.includes('@')) return;
+  STATE.waitlist.unshift({email,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),source:'Manual'});
+  saveState(); input.value=''; renderWaitlistAdmin();
+}
+
+function removeWaitlist(i) { STATE.waitlist.splice(i,1); saveState(); renderWaitlistAdmin(); }
+
+function exportWaitlist() {
+  if (!STATE.waitlist.length) { alert('No entries to export.'); return; }
+  const csv = 'Email,Date,Source\n' + STATE.waitlist.map(e=>`${e.email},${e.date},${e.source}`).join('\n');
+  const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='sellara-waitlist.csv'; a.click();
+}
+
+// ── STRIPE ──
+function loadStripePanel() {
+  document.getElementById('link-starter').value = STATE.stripeLinks.starter;
+  document.getElementById('link-pro').value = STATE.stripeLinks.pro;
+  const btn = document.getElementById('stripe-connect-btn');
+  if (STATE.stripeConnected) { btn.textContent='✓ Connected'; btn.className='stripe-btn connected'; }
+}
+
+function connectStripe() {
+  window.open('https://dashboard.stripe.com/register','_blank');
+  setTimeout(()=>{
+    STATE.stripeConnected=true; saveState();
+    document.getElementById('stripe-connect-btn').textContent='✓ Connected';
+    document.getElementById('stripe-connect-btn').className='stripe-btn connected';
+    document.getElementById('overview-stripe-status').textContent='Connected ✓';
+    document.getElementById('overview-stripe-status').style.color='var(--green)';
+  },2000);
+}
+
+function savePaymentLinks() {
+  STATE.stripeLinks.starter = document.getElementById('link-starter').value.trim();
+  STATE.stripeLinks.pro = document.getElementById('link-pro').value.trim();
+  saveState();
+  const el = document.getElementById('links-saved'); el.style.display='inline';
+  setTimeout(()=>el.style.display='none',3000);
+}
+
+function handleCheckout(plan) {
+  const link = plan==='starter' ? STATE.stripeLinks.starter : STATE.stripeLinks.pro;
+  if (link && link.startsWith('http')) { window.open(link,'_blank'); return; }
+  const modal = document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:999;backdrop-filter:blur(4px);';
+  modal.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2.5rem;max-width:420px;width:90%;text-align:center;"><div style="font-size:2rem;margin-bottom:1rem;">💳</div><div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:300;margin-bottom:0.75rem;">Payment not configured yet</div><p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem;line-height:1.65;">The ${plan==='starter'?'Starter':'Pro'} plan checkout hasn't been set up yet. Add your Stripe payment link in the admin dashboard.</p><button onclick="this.closest('div[style*=fixed]').remove()" style="background:var(--purple);color:#fff;border:none;border-radius:8px;padding:0.7rem 2rem;font-size:0.875rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Got it</button></div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+// ── SETTINGS ──
+function loadSettings() { document.getElementById('settings-email').value = STATE.admin.email; }
+
+function saveCredentials() {
+  const email = document.getElementById('settings-email').value.trim();
+  const pass = document.getElementById('settings-pass').value;
+  const pass2 = document.getElementById('settings-pass2').value;
+  const errEl = document.getElementById('creds-error'); errEl.style.display='none';
+  if (!email) { errEl.textContent='Email required.'; errEl.style.display='block'; return; }
+  if (pass && pass!==pass2) { errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return; }
+  STATE.admin.email=email; if(pass) STATE.admin.password=pass; saveState();
+  document.getElementById('settings-pass').value=''; document.getElementById('settings-pass2').value='';
+  const el=document.getElementById('creds-saved'); el.style.display='inline';
+  setTimeout(()=>el.style.display='none',3000);
+}
+
+function saveBizInfo() {
+  const el=document.getElementById('biz-saved'); el.style.display='inline';
+  setTimeout(()=>el.style.display='none',3000);
+}
+
+// ── INIT ──
+loadState();
+renderTestimonials();
+renderFaq();
+</script>
+</body>
+</html>
