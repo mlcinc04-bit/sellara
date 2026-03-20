@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python3 -m json.tool)"
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s -X POST https://sellara.netlify.app/.netlify/functions/generate -H \"Content-Type: application/json\" -d '{\"\"\"\"product\"\"\"\": \"\"\"\"posture corrector\"\"\"\"}')"
     ]
   }
 }
