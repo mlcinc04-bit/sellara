@@ -251,7 +251,7 @@ footer { border-top: 1px solid var(--border-dim); padding: 2rem 2.5rem; display:
     <h1>Find winning products.<br><em>Market them faster.</em></h1>
     <p class="hero-sub">Sellara surfaces trending products for Shopify and TikTok Shop — then tells you exactly who to target and what to say.</p>
     <div class="hero-actions">
-      <button class="btn-primary" onclick="scrollTo('capture-section')">Join the waitlist</button>
+      <button class="btn-primary" onclick="showPage('page-tool')">Try it free</button>
       <button class="btn-ghost" onclick="scrollTo('features-section')">See how it works</button>
     </div>
     <p class="hero-note">No credit card required &nbsp;·&nbsp; Cancel anytime</p>
@@ -358,6 +358,58 @@ footer { border-top: 1px solid var(--border-dim); padding: 2rem 2.5rem; display:
   </footer>
 </div>
 
+
+<!-- ═══════════════ TOOL PAGE ═══════════════ -->
+<div id="page-tool" class="page">
+  <nav>
+    <span class="nav-logo" onclick="showPage('page-landing')">Sell<span>ara</span></span>
+    <ul class="nav-links">
+      <li><a onclick="showPage('page-landing')">← Back to home</a></li>
+    </ul>
+  </nav>
+  <div style="min-height:100vh;padding:7rem 2rem 4rem;max-width:860px;margin:0 auto;">
+    <p class="section-label">AI Tool</p>
+    <h2>Product <em>Analyzer</em></h2>
+    <p class="section-sub">Enter a product and get your target audience + ad copy instantly.</p>
+
+    <div style="display:flex;gap:0.75rem;margin-bottom:2.5rem;">
+      <input id="tool-input" class="capture-input" type="text" placeholder="e.g. posture corrector, LED strip lights, yoga mat..." style="font-size:1rem;padding:0.9rem 1.25rem;" onkeydown="if(event.key==='Enter')runTool()" />
+      <button class="capture-btn" onclick="runTool()" id="tool-btn" style="padding:0.9rem 2rem;font-size:1rem;white-space:nowrap;">Analyze</button>
+    </div>
+
+    <div id="tool-loading" style="display:none;text-align:center;padding:3rem;color:var(--text-muted);">
+      <div style="font-size:1.5rem;margin-bottom:0.75rem;">⏳</div>
+      Generating your audience & ad copy...
+    </div>
+
+    <div id="tool-results" style="display:none;">
+      <div style="background:var(--bg2);border:1px solid var(--border-dim);border-radius:16px;padding:2rem;margin-bottom:1.5rem;">
+        <div style="font-size:0.78rem;color:var(--purple);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.25rem;">Target Audience</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+          <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">AGE RANGE</div><div id="res-age" style="font-size:0.95rem;color:var(--text);"></div></div>
+          <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">GENDER</div><div id="res-gender" style="font-size:0.95rem;color:var(--text);"></div></div>
+          <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">INTERESTS</div><div id="res-interests" style="font-size:0.95rem;color:var(--text);"></div></div>
+          <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">PLATFORMS</div><div id="res-platforms" style="font-size:0.95rem;color:var(--text);"></div></div>
+          <div style="grid-column:span 2;"><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">PAIN POINTS</div><div id="res-pain" style="font-size:0.95rem;color:var(--text);"></div></div>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border-dim);border-radius:16px;padding:2rem;">
+        <div style="font-size:0.78rem;color:var(--purple);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.25rem;">Ad Copy</div>
+        <div style="display:flex;flex-direction:column;gap:1.25rem;">
+          <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">TIKTOK HOOK</div><div id="res-hook" style="font-size:0.95rem;color:var(--text);background:var(--bg3);padding:0.85rem 1rem;border-radius:8px;"></div></div>
+          <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">META HEADLINE</div><div id="res-headline" style="font-size:0.95rem;color:var(--text);background:var(--bg3);padding:0.85rem 1rem;border-radius:8px;"></div></div>
+          <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">BODY COPY</div><div id="res-body" style="font-size:0.95rem;color:var(--text);background:var(--bg3);padding:0.85rem 1rem;border-radius:8px;line-height:1.65;"></div></div>
+          <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">VIDEO SCRIPT (15s)</div><div id="res-script" style="font-size:0.95rem;color:var(--text);background:var(--bg3);padding:0.85rem 1rem;border-radius:8px;line-height:1.65;"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem;text-align:center;">
+        <button class="btn-ghost" onclick="document.getElementById('tool-input').value='';document.getElementById('tool-results').style.display='none';">Analyze another product</button>
+      </div>
+    </div>
+
+    <div id="tool-error" style="display:none;background:rgba(240,112,112,0.1);border:1px solid rgba(240,112,112,0.3);color:var(--red);padding:1rem 1.25rem;border-radius:8px;margin-top:1rem;"></div>
+  </div>
+</div>
 
 <!-- ═══════════════ LOGIN ═══════════════ -->
 <div id="page-login" class="page">
@@ -826,6 +878,48 @@ function saveBizInfo() {
 loadState();
 renderTestimonials();
 renderFaq();
+
+async function runTool() {
+  const input = document.getElementById('tool-input');
+  const product = input.value.trim();
+  if (!product) { input.style.borderColor = 'var(--red)'; setTimeout(() => input.style.borderColor = '', 1500); return; }
+
+  document.getElementById('tool-loading').style.display = 'block';
+  document.getElementById('tool-results').style.display = 'none';
+  document.getElementById('tool-error').style.display = 'none';
+  document.getElementById('tool-btn').disabled = true;
+  document.getElementById('tool-btn').textContent = 'Analyzing...';
+
+  try {
+    const res = await fetch('/.netlify/functions/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product })
+    });
+    const data = await res.json();
+
+    document.getElementById('res-age').textContent = data.audience.age;
+    document.getElementById('res-gender').textContent = data.audience.gender;
+    document.getElementById('res-interests').textContent = data.audience.interests.join(', ');
+    document.getElementById('res-platforms').textContent = data.audience.platforms.join(', ');
+    document.getElementById('res-pain').textContent = data.audience.painPoints.join(' · ');
+    document.getElementById('res-hook').textContent = data.adCopy.tiktokHook;
+    document.getElementById('res-headline').textContent = data.adCopy.metaHeadline;
+    document.getElementById('res-body').textContent = data.adCopy.bodyText;
+    document.getElementById('res-script').textContent = data.adCopy.videoScript;
+
+    document.getElementById('tool-loading').style.display = 'none';
+    document.getElementById('tool-results').style.display = 'block';
+  } catch(e) {
+    document.getElementById('tool-loading').style.display = 'none';
+    const err = document.getElementById('tool-error');
+    err.textContent = 'Something went wrong. Please try again.';
+    err.style.display = 'block';
+  }
+
+  document.getElementById('tool-btn').disabled = false;
+  document.getElementById('tool-btn').textContent = 'Analyze';
+}
 </script>
 </body>
 </html>
