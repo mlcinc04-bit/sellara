@@ -33,7 +33,8 @@ Return a JSON object with this exact structure:
     "tiktokHook": "attention-grabbing opening line for TikTok",
     "metaHeadline": "Facebook/Instagram ad headline",
     "bodyText": "2-3 sentence ad body copy",
-    "videoScript": "15-second video script outline"
+    "videoScript": "15-second video script outline",
+    "videoSearchQuery": "best YouTube search query to find a viral TikTok or ad video closely related to this product (short, 4-6 words)"
   }
 }
 

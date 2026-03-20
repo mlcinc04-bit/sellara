@@ -400,6 +400,7 @@ footer { border-top: 1px solid var(--border-dim); padding: 2rem 2.5rem; display:
           <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">META HEADLINE</div><div id="res-headline" style="font-size:0.95rem;color:var(--text);background:var(--bg3);padding:0.85rem 1rem;border-radius:8px;"></div></div>
           <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">BODY COPY</div><div id="res-body" style="font-size:0.95rem;color:var(--text);background:var(--bg3);padding:0.85rem 1rem;border-radius:8px;line-height:1.65;"></div></div>
           <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">VIDEO SCRIPT (15s)</div><div id="res-script" style="font-size:0.95rem;color:var(--text);background:var(--bg3);padding:0.85rem 1rem;border-radius:8px;line-height:1.65;"></div></div>
+          <div><div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem;">REFERENCE VIDEOS</div><a id="res-video-link" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;background:var(--bg3);padding:0.85rem 1rem;border-radius:8px;color:var(--purple-light);font-size:0.95rem;text-decoration:none;border:1px solid var(--border-dim);transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--border-dim)'">▶ Search related videos on YouTube</a></div>
         </div>
       </div>
       <div style="margin-top:1.5rem;text-align:center;">
@@ -907,6 +908,8 @@ async function runTool() {
     document.getElementById('res-headline').textContent = data.adCopy.metaHeadline;
     document.getElementById('res-body').textContent = data.adCopy.bodyText;
     document.getElementById('res-script').textContent = data.adCopy.videoScript;
+    const query = encodeURIComponent(data.adCopy.videoSearchQuery || product);
+    document.getElementById('res-video-link').href = `https://www.youtube.com/results?search_query=${query}`;
 
     document.getElementById('tool-loading').style.display = 'none';
     document.getElementById('tool-results').style.display = 'block';
