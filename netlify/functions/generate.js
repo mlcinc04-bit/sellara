@@ -43,8 +43,17 @@ Return only valid JSON, no other text.`
   });
 
   const data = await response.json();
-  const text = data.content[0].text;
-  const result = JSON.parse(text);
+
+  if (!response.ok || !data.content) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: data.error?.message || 'API error', raw: data })
+    };
+  }
+
+  const text = data.content[0].text.trim();
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  const result = JSON.parse(jsonMatch ? jsonMatch[0] : text);
 
   return {
     statusCode: 200,
